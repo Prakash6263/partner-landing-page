@@ -4,8 +4,8 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 
 // CSS ORDER MATTERS
-import '../public/css/bootstrap.min.css'
-import '../public/css/style.css'
+import '/css/bootstrap.min.css'
+import '/css/style.css'
 
 
 
