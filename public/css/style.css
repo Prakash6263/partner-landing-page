@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+  body {
+      font-family: "Poppins", sans-serif;
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
+        url('/images/hero.jpg');
+      background-size: cover;
+      background-position: center;
+      min-height: 85vh;
+      color: #fff;
+      display: flex;
+      align-items: center;
+    }
+
+    /* SERVICES */
+    .service-card {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+      transition: .3s;
+      background: #fff;
+    }
+
+    .service-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 45px rgba(0,0,0,.15);
+    }
+
+    .service-card img {
+      height: 220px;
+      width: 100%;
+      object-fit: cover;
+    }
+
+    /* FEATURES */
+    .feature-card {
+      padding: 30px;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+      transition: .3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+
+    /* FAQ */
+    .accordion-button:not(.collapsed) {
+      background: #f4f6ff;
+      color: #0d6efd;
+    }
+
+    footer {
+      background: #0b132b;
+      color: #ccc;
+    }
+
+    .section-padding{
+      padding:100px 40px;
+    }
+    .form-card {
+      border-radius: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.08);
+      border: none;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    .btn-primary{
+      background:linear-gradient(90deg, #00C6FF 0%, #0072FF 100%);
+    }
