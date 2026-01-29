@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -51,7 +53,7 @@ function PartnerRegisterPage() {
     <div>
       <Navbar />
 
-      <section style={{ paddingTop: '100px', paddingBottom: '50px' }}>
+      <section style={{ paddingTop: '120px', paddingBottom: '50px' }}>
         <div className="container py-5">
           <div className="row">
             <div style={{ maxWidth: '900px', margin: '0 auto', width: '100%' }}>

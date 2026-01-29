@@ -50,7 +50,7 @@ function HomePage() {
       <Navbar />
 
       {/* HERO */}
-      <section className="hero">
+      <section className="hero" style={{ marginTop: '70px' }}>
         <div className="container text-center">
           <h1 className="display-5 fw-semibold mb-3">
             Trusted Service Partners
@@ -82,7 +82,7 @@ function HomePage() {
               <div key={service.id} className="col-lg-4 col-md-6">
                 <div className="service-card">
                   <img
-                    src={service.image}
+                    src={service.image || "/placeholder.svg"}
                     alt={`${service.name} Service`}
                   />
                   <div className="p-4 text-center">
