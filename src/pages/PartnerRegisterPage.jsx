@@ -53,10 +53,10 @@ function PartnerRegisterPage() {
     <div>
       <Navbar />
 
-      <section style={{ paddingTop: '120px', paddingBottom: '50px' }}>
+      <section className="section-padding">
         <div className="container py-5">
-          <div className="row">
-            <div style={{ maxWidth: '900px', margin: '0 auto', width: '100%' }}>
+          <div className="row justify-content-center">
+            <div className="col-lg-10">
               <div className="card form-card">
                 <div className="card-header mb-4">
                   <h4 className="fw-bold">Partner Registration</h4>
