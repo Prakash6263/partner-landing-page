@@ -6,16 +6,14 @@
 
     /* HERO */
     .hero {
-      background: #808080;
+      background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
+        url('../images/hero.jpg');
       background-size: cover;
       background-position: center;
-      background-attachment: fixed;
       min-height: 85vh;
       color: #fff;
       display: flex;
       align-items: center;
-      margin-top: -70px;
-      padding-top: 70px;
     }
 
     /* SERVICES */
