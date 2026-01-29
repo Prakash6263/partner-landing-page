@@ -1,18 +1,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
   body {
       font-family: "Poppins", sans-serif;
+      padding-top: 70px;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      background: #fff !important;
+      box-shadow: 0 2px 10px rgba(0,0,0,.1) !important;
+      top: 0;
+      width: 100%;
+      z-index: 999;
+    }
+
+    .navbar-brand img {
+      height: 50px;
+      width: auto;
+    }
+
+    .navbar .btn-primary {
+      background: linear-gradient(90deg, #00C6FF 0%, #0072FF 100%) !important;
+      border: none;
+      padding: 10px 25px !important;
+      font-weight: 500;
     }
 
     /* HERO */
     .hero {
-      background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
-        url('/images/hero.jpg');
-      background-size: cover;
-      background-position: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 85vh;
       color: #fff;
       display: flex;
       align-items: center;
+      padding: 60px 20px;
     }
 
     /* SERVICES */

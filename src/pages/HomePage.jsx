@@ -50,7 +50,7 @@ function HomePage() {
       <Navbar />
 
       {/* HERO */}
-      <section className="hero" style={{ marginTop: '60px' }}>
+      <section className="hero">
         <div className="container text-center">
           <h1 className="display-5 fw-semibold mb-3">
             Trusted Service Partners
