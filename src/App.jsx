@@ -5,6 +5,7 @@ import PartnerRegisterPage from './pages/PartnerRegisterPage'
 function App() {
   return (
     <Routes>
+      
       <Route path="/" element={<HomePage />} />
       <Route path="/partner-register" element={<PartnerRegisterPage />} />
     </Routes>

@@ -5,7 +5,7 @@ function Navbar() {
     <nav className="navbar">
       <div className="container" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
         <Link to="/" className="navbar-brand">
-          <img src="/images/logo-2.png" alt="Appointment Hub Logo" />
+          <img src="images/logo-2.png" alt="Appointment Hub Logo" />
 
         </Link>
 

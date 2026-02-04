@@ -51,7 +51,7 @@ function PartnerRegisterPage() {
     <div>
       <Navbar />
 
-      <section style={{ paddingTop: '100px', paddingBottom: '50px' }}>
+      <section >
         <div className="container py-5">
           <div className="row">
             <div style={{ maxWidth: '900px', margin: '0 auto', width: '100%' }}>
