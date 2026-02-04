@@ -25,12 +25,45 @@ function PartnerRegisterPage() {
     agreeTerms: false,
   })
 
+  const [errors, setErrors] = useState({})
+  const [isLoading, setIsLoading] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState(null)
+
+  const validateForm = () => {
+    const newErrors = {}
+
+    if (!formData.businessName.trim()) newErrors.businessName = 'Business name is required'
+    if (!formData.serviceCategory) newErrors.serviceCategory = 'Service category is required'
+    if (!formData.ownerName.trim()) newErrors.ownerName = 'Owner name is required'
+    if (!formData.mobileNumber.trim()) newErrors.mobileNumber = 'Mobile number is required'
+    else if (!/^[0-9]{10}$/.test(formData.mobileNumber.replace(/\D/g, ''))) 
+      newErrors.mobileNumber = 'Valid 10-digit mobile number required'
+    if (!formData.email.trim()) newErrors.email = 'Email is required'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) 
+      newErrors.email = 'Valid email required'
+    if (!formData.fullAddress.trim()) newErrors.fullAddress = 'Full address is required'
+    if (!formData.city.trim()) newErrors.city = 'City is required'
+    if (!formData.state.trim()) newErrors.state = 'State is required'
+    if (!formData.pincode.trim()) newErrors.pincode = 'Pincode is required'
+    else if (!/^[0-9]{6}$/.test(formData.pincode)) newErrors.pincode = 'Valid 6-digit pincode required'
+    if (!formData.agreeTerms) newErrors.agreeTerms = 'You must agree to terms and conditions'
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }))
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }))
+    }
   }
 
   const handleFileChange = (e) => {
@@ -41,17 +74,72 @@ function PartnerRegisterPage() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
-    alert('Registration submitted! (This is a demo)')
+    
+    if (!validateForm()) {
+      setSubmitStatus({ type: 'error', message: 'Please fix the errors above' })
+      return
+    }
+
+    setIsLoading(true)
+    setSubmitStatus(null)
+
+    try {
+      const formDataToSend = new FormData()
+      Object.keys(formData).forEach((key) => {
+        if (key === 'idProof' || key === 'license') {
+          if (formData[key]) formDataToSend.append(key, formData[key])
+        } else {
+          formDataToSend.append(key, formData[key])
+        }
+      })
+
+      const response = await fetch('https://api.partnerregistration.com/register', {
+        method: 'POST',
+        body: formDataToSend,
+      })
+
+      if (!response.ok) {
+        throw new Error('Registration failed')
+      }
+
+      const result = await response.json()
+      setSubmitStatus({ type: 'success', message: 'Registration submitted successfully!' })
+      setFormData({
+        businessName: '',
+        serviceCategory: '',
+        yearsOfExperience: '',
+        businessRegistrationNo: '',
+        ownerName: '',
+        mobileNumber: '',
+        email: '',
+        alternateContact: '',
+        fullAddress: '',
+        city: '',
+        state: '',
+        pincode: '',
+        serviceArea: '',
+        workingDays: 'Monday - Friday',
+        openingTime: '',
+        closingTime: '',
+        idProof: null,
+        license: null,
+        agreeTerms: false,
+      })
+    } catch (error) {
+      console.error('Registration error:', error)
+      setSubmitStatus({ type: 'error', message: 'Failed to submit registration. Please try again.' })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <div>
       <Navbar />
 
-      <section >
+      <section>
         <div className="container py-5">
           <div className="row">
             <div style={{ maxWidth: '900px', margin: '0 auto', width: '100%' }}>
@@ -64,6 +152,12 @@ function PartnerRegisterPage() {
                 </div>
 
                 <div className="card-body">
+                  {submitStatus && (
+                    <div className={`alert alert-${submitStatus.type === 'success' ? 'success' : 'danger'} mb-4`}>
+                      {submitStatus.message}
+                    </div>
+                  )}
+
                   <form onSubmit={handleSubmit}>
                     {/* BUSINESS INFORMATION */}
                     <div className="mb-4">
@@ -74,19 +168,20 @@ function PartnerRegisterPage() {
                           <label className="form-label">Business Name *</label>
                           <input
                             type="text"
-                            className="form-control"
+                            className={`form-control ${errors.businessName ? 'is-invalid' : ''}`}
                             name="businessName"
                             value={formData.businessName}
                             onChange={handleChange}
                             placeholder="Enter business name"
                             required
                           />
+                          {errors.businessName && <div className="invalid-feedback">{errors.businessName}</div>}
                         </div>
 
                         <div className="col-md-6">
                           <label className="form-label">Service Category *</label>
                           <select
-                            className="form-select"
+                            className={`form-select ${errors.serviceCategory ? 'is-invalid' : ''}`}
                             name="serviceCategory"
                             value={formData.serviceCategory}
                             onChange={handleChange}
@@ -100,6 +195,7 @@ function PartnerRegisterPage() {
                             <option value="Barber / Salon">Barber / Salon</option>
                             <option value="Gym">Gym</option>
                           </select>
+                          {errors.serviceCategory && <div className="invalid-feedback">{errors.serviceCategory}</div>}
                         </div>
 
                         <div className="col-md-6">
@@ -139,36 +235,39 @@ function PartnerRegisterPage() {
                           <label className="form-label">Owner Name *</label>
                           <input
                             type="text"
-                            className="form-control"
+                            className={`form-control ${errors.ownerName ? 'is-invalid' : ''}`}
                             name="ownerName"
                             value={formData.ownerName}
                             onChange={handleChange}
                             required
                           />
+                          {errors.ownerName && <div className="invalid-feedback">{errors.ownerName}</div>}
                         </div>
 
                         <div className="col-md-6">
                           <label className="form-label">Mobile Number *</label>
                           <input
                             type="tel"
-                            className="form-control"
+                            className={`form-control ${errors.mobileNumber ? 'is-invalid' : ''}`}
                             name="mobileNumber"
                             value={formData.mobileNumber}
                             onChange={handleChange}
                             required
                           />
+                          {errors.mobileNumber && <div className="invalid-feedback">{errors.mobileNumber}</div>}
                         </div>
 
                         <div className="col-md-6">
                           <label className="form-label">Email Address *</label>
                           <input
                             type="email"
-                            className="form-control"
+                            className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
                             required
                           />
+                          {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                         </div>
 
                         <div className="col-md-6">
@@ -194,49 +293,53 @@ function PartnerRegisterPage() {
                         <div className="col-12">
                           <label className="form-label">Full Address *</label>
                           <textarea
-                            className="form-control"
+                            className={`form-control ${errors.fullAddress ? 'is-invalid' : ''}`}
                             name="fullAddress"
                             rows="2"
                             value={formData.fullAddress}
                             onChange={handleChange}
                             required
                           />
+                          {errors.fullAddress && <div className="invalid-feedback">{errors.fullAddress}</div>}
                         </div>
 
                         <div className="col-md-4">
                           <label className="form-label">City *</label>
                           <input
                             type="text"
-                            className="form-control"
+                            className={`form-control ${errors.city ? 'is-invalid' : ''}`}
                             name="city"
                             value={formData.city}
                             onChange={handleChange}
                             required
                           />
+                          {errors.city && <div className="invalid-feedback">{errors.city}</div>}
                         </div>
 
                         <div className="col-md-4">
                           <label className="form-label">State *</label>
                           <input
                             type="text"
-                            className="form-control"
+                            className={`form-control ${errors.state ? 'is-invalid' : ''}`}
                             name="state"
                             value={formData.state}
                             onChange={handleChange}
                             required
                           />
+                          {errors.state && <div className="invalid-feedback">{errors.state}</div>}
                         </div>
 
                         <div className="col-md-4">
                           <label className="form-label">Pincode *</label>
                           <input
                             type="text"
-                            className="form-control"
+                            className={`form-control ${errors.pincode ? 'is-invalid' : ''}`}
                             name="pincode"
                             value={formData.pincode}
                             onChange={handleChange}
                             required
                           />
+                          {errors.pincode && <div className="invalid-feedback">{errors.pincode}</div>}
                         </div>
                       </div>
                     </div>
@@ -342,7 +445,7 @@ function PartnerRegisterPage() {
                       }}
                     >
                       <input
-                        className="form-check-input"
+                        className={`form-check-input ${errors.agreeTerms ? 'is-invalid' : ''}`}
                         type="checkbox"
                         name="agreeTerms"
                         id="terms"
@@ -353,6 +456,7 @@ function PartnerRegisterPage() {
                       <label htmlFor="terms" className="form-check-label">
                         I agree to the Terms & Conditions and Privacy Policy
                       </label>
+                      {errors.agreeTerms && <div className="invalid-feedback" style={{ display: 'block' }}>{errors.agreeTerms}</div>}
                     </div>
 
                     {/* SUBMIT */}
@@ -360,8 +464,9 @@ function PartnerRegisterPage() {
                       <button
                         type="submit"
                         className="btn btn-primary btn-lg px-5 rounded-pill"
+                        disabled={isLoading}
                       >
-                        Submit Registration
+                        {isLoading ? 'Submitting...' : 'Submit Registration'}
                       </button>
                     </div>
                   </form>
