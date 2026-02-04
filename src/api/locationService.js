@@ -3,43 +3,30 @@ const API_BASE_URL = 'http://localhost:5000/api/location'
 
 export const getCountries = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/countries`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
+    const response = await fetch(`${API_BASE_URL}/countries`)
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     const data = await response.json()
-    console.log('[v0] Countries raw response:', data)
+    console.log('[v0] getCountries raw response:', data, 'type:', typeof data, 'isArray:', Array.isArray(data))
     
-    // Handle different response formats
-    let dataArray = data
-    if (!Array.isArray(data)) {
-      // Try to extract array from wrapper object
-      dataArray = data.countries || data.data || data.list || []
-    }
-    
-    console.log('[v0] Countries data array:', dataArray)
-    
-    // API returns array of objects with 'name' property
-    if (Array.isArray(dataArray)) {
-      const countries = dataArray
-        .filter(item => item && item.name) // Only include items with name property
-        .map(item => item.name)             // Extract only the name string
-      console.log('[v0] Countries extracted:', countries)
+    // Response is directly an array of objects with { name, code } structure
+    if (Array.isArray(data) && data.length > 0) {
+      const countries = data.map(item => {
+        console.log('[v0] Country item:', item)
+        return item.name || item
+      }).filter(Boolean)
+      console.log('[v0] Extracted countries:', countries)
       return countries
     }
     
-    console.warn('[v0] Countries data is not an array:', dataArray)
+    console.warn('[v0] getCountries returned no data:', data)
     return []
   } catch (error) {
-    console.error('[v0] Error fetching countries:', error)
-    throw new Error('Failed to fetch countries: ' + error.message)
+    console.error('[v0] Error in getCountries:', error)
+    throw error
   }
 }
 
@@ -59,31 +46,23 @@ export const getStates = async (country) => {
     }
 
     const data = await response.json()
-    console.log('[v0] States raw response:', data)
+    console.log('[v0] getStates raw response:', data, 'type:', typeof data, 'isArray:', Array.isArray(data))
     
-    // Handle different response formats
-    let dataArray = data
-    if (!Array.isArray(data)) {
-      // Try to extract array from wrapper object
-      dataArray = data.states || data.data || data.list || []
-    }
-    
-    console.log('[v0] States data array:', dataArray)
-    
-    // API returns array of objects with 'name' property
-    if (Array.isArray(dataArray)) {
-      const states = dataArray
-        .filter(item => item && item.name)  // Only include items with name property
-        .map(item => item.name)             // Extract only the name string
-      console.log('[v0] States extracted:', states)
+    // Response is directly an array of objects with { name } structure
+    if (Array.isArray(data) && data.length > 0) {
+      const states = data.map(item => {
+        console.log('[v0] State item:', item)
+        return item.name || item
+      }).filter(Boolean)
+      console.log('[v0] Extracted states:', states)
       return states
     }
     
-    console.warn('[v0] States data is not an array:', dataArray)
+    console.warn('[v0] getStates returned no data:', data)
     return []
   } catch (error) {
-    console.error('[v0] Error fetching states:', error)
-    throw new Error('Failed to fetch states: ' + error.message)
+    console.error('[v0] Error in getStates:', error)
+    throw error
   }
 }
 
@@ -103,30 +82,22 @@ export const getCities = async (country, state) => {
     }
 
     const data = await response.json()
-    console.log('[v0] Cities raw response:', data)
+    console.log('[v0] getCities raw response:', data, 'type:', typeof data, 'isArray:', Array.isArray(data))
     
-    // Handle different response formats
-    let dataArray = data
-    if (!Array.isArray(data)) {
-      // Try to extract array from wrapper object
-      dataArray = data.cities || data.data || data.list || []
-    }
-    
-    console.log('[v0] Cities data array:', dataArray)
-    
-    // API returns array of objects with 'name' property
-    if (Array.isArray(dataArray)) {
-      const cities = dataArray
-        .filter(item => item && item.name)  // Only include items with name property
-        .map(item => item.name)             // Extract only the name string
-      console.log('[v0] Cities extracted:', cities)
+    // Response is directly an array of objects with { name } structure
+    if (Array.isArray(data) && data.length > 0) {
+      const cities = data.map(item => {
+        console.log('[v0] City item:', item)
+        return item.name || item
+      }).filter(Boolean)
+      console.log('[v0] Extracted cities:', cities)
       return cities
     }
     
-    console.warn('[v0] Cities data is not an array:', dataArray)
+    console.warn('[v0] getCities returned no data:', data)
     return []
   } catch (error) {
-    console.error('[v0] Error fetching cities:', error)
-    throw new Error('Failed to fetch cities: ' + error.message)
+    console.error('[v0] Error in getCities:', error)
+    throw error
   }
 }
