@@ -123,7 +123,7 @@ export default function PartnerRegister() {
       formDataToSend.append('state', formData.state)
       formDataToSend.append('country', formData.country)
 
-      const response = await fetch('http://localhost:5000/api/partner/register', {
+      const response = await fetch('/api/partner/register', {
         method: 'POST',
         body: formDataToSend
       })
