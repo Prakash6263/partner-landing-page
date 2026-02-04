@@ -3,6 +3,7 @@ const API_BASE_URL = 'http://localhost:5000/api/location'
 
 export const getCountries = async () => {
   try {
+    console.log('[v0] Fetching countries from:', `${API_BASE_URL}/countries`)
     const response = await fetch(`${API_BASE_URL}/countries`, {
       method: 'GET',
       headers: {
@@ -10,21 +11,28 @@ export const getCountries = async () => {
       },
     })
 
+    console.log('[v0] Countries response status:', response.status)
+    
     if (!response.ok) {
-      throw new Error('Failed to fetch countries')
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     const data = await response.json()
-    console.log('[v0] Countries fetched:', data)
-    return data.countries || data.data || []
+    console.log('[v0] Countries raw data:', data)
+    
+    // Handle different API response formats
+    const result = Array.isArray(data) ? data : (data.countries || data.data || [])
+    console.log('[v0] Countries processed:', result)
+    return result
   } catch (error) {
-    console.error('[v0] Error fetching countries:', error)
-    throw error
+    console.error('[v0] Error fetching countries:', error.message)
+    throw new Error('Failed to fetch countries: ' + error.message)
   }
 }
 
 export const getStates = async (country) => {
   try {
+    console.log('[v0] Fetching states for country:', country)
     const response = await fetch(`${API_BASE_URL}/states`, {
       method: 'POST',
       headers: {
@@ -33,21 +41,28 @@ export const getStates = async (country) => {
       body: JSON.stringify({ country }),
     })
 
+    console.log('[v0] States response status:', response.status)
+    
     if (!response.ok) {
-      throw new Error('Failed to fetch states')
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     const data = await response.json()
-    console.log('[v0] States fetched:', data)
-    return data.states || data.data || []
+    console.log('[v0] States raw data:', data)
+    
+    // Handle different API response formats
+    const result = Array.isArray(data) ? data : (data.states || data.data || [])
+    console.log('[v0] States processed:', result)
+    return result
   } catch (error) {
-    console.error('[v0] Error fetching states:', error)
-    throw error
+    console.error('[v0] Error fetching states:', error.message)
+    throw new Error('Failed to fetch states: ' + error.message)
   }
 }
 
 export const getCities = async (country, state) => {
   try {
+    console.log('[v0] Fetching cities for country:', country, 'state:', state)
     const response = await fetch(`${API_BASE_URL}/cities`, {
       method: 'POST',
       headers: {
@@ -56,15 +71,21 @@ export const getCities = async (country, state) => {
       body: JSON.stringify({ country, state }),
     })
 
+    console.log('[v0] Cities response status:', response.status)
+    
     if (!response.ok) {
-      throw new Error('Failed to fetch cities')
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     const data = await response.json()
-    console.log('[v0] Cities fetched:', data)
-    return data.cities || data.data || []
+    console.log('[v0] Cities raw data:', data)
+    
+    // Handle different API response formats
+    const result = Array.isArray(data) ? data : (data.cities || data.data || [])
+    console.log('[v0] Cities processed:', result)
+    return result
   } catch (error) {
-    console.error('[v0] Error fetching cities:', error)
-    throw error
+    console.error('[v0] Error fetching cities:', error.message)
+    throw new Error('Failed to fetch cities: ' + error.message)
   }
 }

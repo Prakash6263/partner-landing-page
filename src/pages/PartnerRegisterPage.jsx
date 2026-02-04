@@ -29,18 +29,21 @@ function PartnerRegisterPage() {
   const [states, setStates] = useState([])
   const [cities, setCities] = useState([])
   const [loadingLocations, setLoadingLocations] = useState(false)
+  const [error, setError] = useState(null)
 
   // Fetch countries on component mount
   useEffect(() => {
     const fetchCountries = async () => {
       try {
         setLoadingLocations(true)
+        setError(null)
         const data = await getCountries()
+        console.log('[v0] Setting countries:', data)
         setCountries(Array.isArray(data) ? data : [])
-        console.log('[v0] Countries loaded:', data)
-      } catch (error) {
-        console.error('[v0] Error loading countries:', error)
-        Swal.fire('Error', 'Failed to load countries', 'error')
+      } catch (err) {
+        console.error('[v0] Error loading countries:', err)
+        setError('Failed to load countries')
+        Swal.fire('Error', 'Failed to load countries: ' + err.message, 'error')
       } finally {
         setLoadingLocations(false)
       }
@@ -58,14 +61,19 @@ function PartnerRegisterPage() {
       }
       try {
         setLoadingLocations(true)
+        setError(null)
+        console.log('[v0] Fetching states for:', formData.country)
         const data = await getStates(formData.country)
-        setStates(Array.isArray(data) ? data : [])
+        console.log('[v0] Setting states:', data)
+        const statesArray = Array.isArray(data) ? data : []
+        setStates(statesArray)
         setCities([])
         setFormData((prev) => ({ ...prev, state: '', city: '' }))
-        console.log('[v0] States loaded:', data)
-      } catch (error) {
-        console.error('[v0] Error loading states:', error)
-        Swal.fire('Error', 'Failed to load states', 'error')
+      } catch (err) {
+        console.error('[v0] Error loading states:', err)
+        setError('Failed to load states')
+        Swal.fire('Error', 'Failed to load states: ' + err.message, 'error')
+        setStates([])
       } finally {
         setLoadingLocations(false)
       }
@@ -82,13 +90,17 @@ function PartnerRegisterPage() {
       }
       try {
         setLoadingLocations(true)
+        setError(null)
+        console.log('[v0] Fetching cities for:', formData.country, formData.state)
         const data = await getCities(formData.country, formData.state)
+        console.log('[v0] Setting cities:', data)
         setCities(Array.isArray(data) ? data : [])
         setFormData((prev) => ({ ...prev, city: '' }))
-        console.log('[v0] Cities loaded:', data)
-      } catch (error) {
-        console.error('[v0] Error loading cities:', error)
-        Swal.fire('Error', 'Failed to load cities', 'error')
+      } catch (err) {
+        console.error('[v0] Error loading cities:', err)
+        setError('Failed to load cities')
+        Swal.fire('Error', 'Failed to load cities: ' + err.message, 'error')
+        setCities([])
       } finally {
         setLoadingLocations(false)
       }
@@ -210,6 +222,12 @@ function PartnerRegisterPage() {
                 </div>
 
                 <div className="card-body">
+                  {error && (
+                    <div className="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                      <strong>Error:</strong> {error}
+                      <button type="button" className="btn-close" onClick={() => setError(null)}></button>
+                    </div>
+                  )}
                   <form onSubmit={handleSubmit}>
                     {/* COMPANY INFORMATION */}
                     <div className="mb-4">
