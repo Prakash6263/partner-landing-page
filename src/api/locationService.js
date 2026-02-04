@@ -1,6 +1,35 @@
 // Location API Service
 const API_BASE_URL = 'http://localhost:5000/api/location'
 
+// Helper function to safely extract names from items
+const extractNames = (items) => {
+  console.log('[v0] extractNames input:', items, 'type:', typeof items)
+  
+  if (!Array.isArray(items)) {
+    console.warn('[v0] Items is not an array:', items)
+    return []
+  }
+  
+  const extracted = items.map((item, index) => {
+    console.log(`[v0] Processing item ${index}:`, item, 'typeof:', typeof item)
+    
+    if (typeof item === 'string') {
+      return item
+    }
+    
+    if (typeof item === 'object' && item !== null && item.name) {
+      console.log(`[v0] Extracted name from object: ${item.name}`)
+      return String(item.name)
+    }
+    
+    console.warn(`[v0] Could not extract name from item ${index}:`, item)
+    return String(item)
+  })
+  
+  console.log('[v0] extractNames output:', extracted)
+  return extracted
+}
+
 export const getCountries = async () => {
   try {
     console.log('[v0] Fetching countries from:', `${API_BASE_URL}/countries`)
@@ -18,15 +47,16 @@ export const getCountries = async () => {
     }
 
     const data = await response.json()
-    console.log('[v0] Countries raw data:', data)
+    console.log('[v0] Countries raw data:', JSON.stringify(data, null, 2))
     
     // Handle different API response formats
     let result = Array.isArray(data) ? data : (data.countries || data.data || [])
+    console.log('[v0] Countries array extracted:', result)
     
-    // Extract names from objects if they have 'name' property
-    result = result.map(item => typeof item === 'string' ? item : (item.name || item))
+    // Extract names from objects
+    result = extractNames(result)
     
-    console.log('[v0] Countries processed:', result)
+    console.log('[v0] Countries final result:', result)
     return result
   } catch (error) {
     console.error('[v0] Error fetching countries:', error.message)
@@ -52,15 +82,16 @@ export const getStates = async (country) => {
     }
 
     const data = await response.json()
-    console.log('[v0] States raw data:', data)
+    console.log('[v0] States raw data:', JSON.stringify(data, null, 2))
     
     // Handle different API response formats
     let result = Array.isArray(data) ? data : (data.states || data.data || [])
+    console.log('[v0] States array extracted:', result)
     
-    // Extract names from objects if they have 'name' property
-    result = result.map(item => typeof item === 'string' ? item : (item.name || item))
+    // Extract names from objects
+    result = extractNames(result)
     
-    console.log('[v0] States processed:', result)
+    console.log('[v0] States final result:', result)
     return result
   } catch (error) {
     console.error('[v0] Error fetching states:', error.message)
@@ -86,15 +117,16 @@ export const getCities = async (country, state) => {
     }
 
     const data = await response.json()
-    console.log('[v0] Cities raw data:', data)
+    console.log('[v0] Cities raw data:', JSON.stringify(data, null, 2))
     
     // Handle different API response formats
     let result = Array.isArray(data) ? data : (data.cities || data.data || [])
+    console.log('[v0] Cities array extracted:', result)
     
-    // Extract names from objects if they have 'name' property
-    result = result.map(item => typeof item === 'string' ? item : (item.name || item))
+    // Extract names from objects
+    result = extractNames(result)
     
-    console.log('[v0] Cities processed:', result)
+    console.log('[v0] Cities final result:', result)
     return result
   } catch (error) {
     console.error('[v0] Error fetching cities:', error.message)
