@@ -21,7 +21,11 @@ export const getCountries = async () => {
     console.log('[v0] Countries raw data:', data)
     
     // Handle different API response formats
-    const result = Array.isArray(data) ? data : (data.countries || data.data || [])
+    let result = Array.isArray(data) ? data : (data.countries || data.data || [])
+    
+    // Extract names from objects if they have 'name' property
+    result = result.map(item => typeof item === 'string' ? item : (item.name || item))
+    
     console.log('[v0] Countries processed:', result)
     return result
   } catch (error) {
@@ -51,7 +55,11 @@ export const getStates = async (country) => {
     console.log('[v0] States raw data:', data)
     
     // Handle different API response formats
-    const result = Array.isArray(data) ? data : (data.states || data.data || [])
+    let result = Array.isArray(data) ? data : (data.states || data.data || [])
+    
+    // Extract names from objects if they have 'name' property
+    result = result.map(item => typeof item === 'string' ? item : (item.name || item))
+    
     console.log('[v0] States processed:', result)
     return result
   } catch (error) {
@@ -81,7 +89,11 @@ export const getCities = async (country, state) => {
     console.log('[v0] Cities raw data:', data)
     
     // Handle different API response formats
-    const result = Array.isArray(data) ? data : (data.cities || data.data || [])
+    let result = Array.isArray(data) ? data : (data.cities || data.data || [])
+    
+    // Extract names from objects if they have 'name' property
+    result = result.map(item => typeof item === 'string' ? item : (item.name || item))
+    
     console.log('[v0] Cities processed:', result)
     return result
   } catch (error) {
