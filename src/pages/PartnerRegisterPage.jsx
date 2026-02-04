@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Swal from 'sweetalert2'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { registerPartner } from '../api/partnerService'
+import { getCountries, getStates, getCities } from '../api/locationService'
 
 function PartnerRegisterPage() {
   const [formData, setFormData] = useState({
@@ -23,7 +25,76 @@ function PartnerRegisterPage() {
 
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState(null)
+  const [countries, setCountries] = useState([])
+  const [states, setStates] = useState([])
+  const [cities, setCities] = useState([])
+  const [loadingLocations, setLoadingLocations] = useState(false)
+
+  // Fetch countries on component mount
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        setLoadingLocations(true)
+        const data = await getCountries()
+        setCountries(Array.isArray(data) ? data : [])
+        console.log('[v0] Countries loaded:', data)
+      } catch (error) {
+        console.error('[v0] Error loading countries:', error)
+        Swal.fire('Error', 'Failed to load countries', 'error')
+      } finally {
+        setLoadingLocations(false)
+      }
+    }
+    fetchCountries()
+  }, [])
+
+  // Fetch states when country changes
+  useEffect(() => {
+    const fetchStates = async () => {
+      if (!formData.country) {
+        setStates([])
+        setCities([])
+        return
+      }
+      try {
+        setLoadingLocations(true)
+        const data = await getStates(formData.country)
+        setStates(Array.isArray(data) ? data : [])
+        setCities([])
+        setFormData((prev) => ({ ...prev, state: '', city: '' }))
+        console.log('[v0] States loaded:', data)
+      } catch (error) {
+        console.error('[v0] Error loading states:', error)
+        Swal.fire('Error', 'Failed to load states', 'error')
+      } finally {
+        setLoadingLocations(false)
+      }
+    }
+    fetchStates()
+  }, [formData.country])
+
+  // Fetch cities when state changes
+  useEffect(() => {
+    const fetchCities = async () => {
+      if (!formData.country || !formData.state) {
+        setCities([])
+        return
+      }
+      try {
+        setLoadingLocations(true)
+        const data = await getCities(formData.country, formData.state)
+        setCities(Array.isArray(data) ? data : [])
+        setFormData((prev) => ({ ...prev, city: '' }))
+        console.log('[v0] Cities loaded:', data)
+      } catch (error) {
+        console.error('[v0] Error loading cities:', error)
+        Swal.fire('Error', 'Failed to load cities', 'error')
+      } finally {
+        setLoadingLocations(false)
+      }
+    }
+    fetchCities()
+  }, [formData.country, formData.state])
 
   const validateForm = () => {
     const newErrors = {}
@@ -80,19 +151,21 @@ function PartnerRegisterPage() {
     e.preventDefault()
     
     if (!validateForm()) {
-      setSubmitStatus({ type: 'error', message: 'Please fix the errors above' })
+      Swal.fire('Validation Error', 'Please fix all the errors in the form', 'error')
       return
     }
 
     setIsLoading(true)
-    setSubmitStatus(null)
 
     try {
       const result = await registerPartner(formData)
       console.log('[v0] Registration successful:', result)
-      setSubmitStatus({ 
-        type: 'success', 
-        message: 'Registration submitted successfully! Please check your email to verify.' 
+      
+      Swal.fire({
+        title: 'Success!',
+        html: `<p>Registration submitted successfully!</p><p>Your Partner ID: <strong>${result.partnerId}</strong></p><p>Please check your email to verify.</p>`,
+        icon: 'success',
+        confirmButtonText: 'OK',
       })
       
       // Reset form
@@ -114,10 +187,7 @@ function PartnerRegisterPage() {
       })
     } catch (error) {
       console.error('[v0] Registration error:', error)
-      setSubmitStatus({ 
-        type: 'error', 
-        message: error.message || 'Failed to submit registration. Please try again.' 
-      })
+      Swal.fire('Error', error.message || 'Failed to submit registration. Please try again.', 'error')
     } finally {
       setIsLoading(false)
     }
@@ -140,12 +210,6 @@ function PartnerRegisterPage() {
                 </div>
 
                 <div className="card-body">
-                  {submitStatus && (
-                    <div className={`alert alert-${submitStatus.type === 'success' ? 'success' : 'danger'} mb-4`}>
-                      {submitStatus.message}
-                    </div>
-                  )}
-
                   <form onSubmit={handleSubmit}>
                     {/* COMPANY INFORMATION */}
                     <div className="mb-4">
@@ -280,51 +344,69 @@ function PartnerRegisterPage() {
                       </div>
                     </div>
 
-                    {/* ADDRESS */}
+                    {/* BUSINESS LOCATION */}
                     <div className="mb-4">
                       <div className="section-title">Business Location</div>
 
                       <div className="row g-3">
                         <div className="col-md-6">
-                          <label className="form-label">City *</label>
-                          <input
-                            type="text"
-                            className={`form-control ${errors.city ? 'is-invalid' : ''}`}
-                            name="city"
-                            value={formData.city}
+                          <label className="form-label">Country *</label>
+                          <select
+                            className={`form-select ${errors.country ? 'is-invalid' : ''}`}
+                            name="country"
+                            value={formData.country}
                             onChange={handleChange}
-                            placeholder="e.g. indore"
+                            disabled={loadingLocations}
                             required
-                          />
-                          {errors.city && <div className="invalid-feedback">{errors.city}</div>}
+                          >
+                            <option value="">Select Country</option>
+                            {countries.map((country) => (
+                              <option key={country} value={country}>
+                                {country}
+                              </option>
+                            ))}
+                          </select>
+                          {errors.country && <div className="invalid-feedback">{errors.country}</div>}
                         </div>
 
                         <div className="col-md-6">
                           <label className="form-label">State *</label>
-                          <input
-                            type="text"
-                            className={`form-control ${errors.state ? 'is-invalid' : ''}`}
+                          <select
+                            className={`form-select ${errors.state ? 'is-invalid' : ''}`}
                             name="state"
                             value={formData.state}
                             onChange={handleChange}
-                            placeholder="e.g. madhya pradesh"
+                            disabled={!formData.country || loadingLocations || states.length === 0}
                             required
-                          />
+                          >
+                            <option value="">Select State</option>
+                            {states.map((state) => (
+                              <option key={state} value={state}>
+                                {state}
+                              </option>
+                            ))}
+                          </select>
                           {errors.state && <div className="invalid-feedback">{errors.state}</div>}
                         </div>
 
                         <div className="col-md-12">
-                          <label className="form-label">Country *</label>
-                          <input
-                            type="text"
-                            className={`form-control ${errors.country ? 'is-invalid' : ''}`}
-                            name="country"
-                            value={formData.country}
+                          <label className="form-label">City *</label>
+                          <select
+                            className={`form-select ${errors.city ? 'is-invalid' : ''}`}
+                            name="city"
+                            value={formData.city}
                             onChange={handleChange}
-                            placeholder="e.g. india"
+                            disabled={!formData.country || !formData.state || loadingLocations || cities.length === 0}
                             required
-                          />
-                          {errors.country && <div className="invalid-feedback">{errors.country}</div>}
+                          >
+                            <option value="">Select City</option>
+                            {cities.map((city) => (
+                              <option key={city} value={city}>
+                                {city}
+                              </option>
+                            ))}
+                          </select>
+                          {errors.city && <div className="invalid-feedback">{errors.city}</div>}
                         </div>
                       </div>
                     </div>
